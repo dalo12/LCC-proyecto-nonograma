@@ -1,6 +1,7 @@
 import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
+import RadioButton from './RadioButton';
 
 class Game extends React.Component {
 
@@ -10,8 +11,10 @@ class Game extends React.Component {
     super(props);
     this.state = {
       grid: null,
-      waiting: false
+      waiting: false,
+      opcion: 'X'
     };
+    this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
     this.pengine = new PengineClient(this.handlePengineCreate);
@@ -36,7 +39,7 @@ class Game extends React.Component {
     // Build Prolog query to make the move, which will look as follows:
     // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
-    const queryS = 'put("#", [' + i + ',' + j + ']' 
+    const queryS = 'put("'+ this.state.opcion +'", [' + i + ',' + j + ']' 
     + ', [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
     this.setState({
       waiting: true
@@ -55,6 +58,12 @@ class Game extends React.Component {
     });
   }
 
+  onValueChange(event){
+    this.setState({
+        opcion: event.target.value
+    });
+  }
+
   render() {
     if (this.state.grid === null) {
       return null;
@@ -69,6 +78,10 @@ class Game extends React.Component {
         <div className="gameInfo">
           {statusText}
         </div>
+        <RadioButton 
+          onChange={this.onValueChange}
+          // Nada por ahora
+        />
       </div>
     );
   }
