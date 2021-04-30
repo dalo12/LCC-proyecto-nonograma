@@ -7,13 +7,14 @@ class RadioButton extends React.Component{
             //name: React, // ¿qué onda con esto?
             opcion: "#"
         };
-        //this.onValueChange = this.onValueChange.bind(this);
+        this.onValueChange = this.onValueChange.bind(this);
         //this.formSubmit = this.formSubmit.bind(this);
     }
 */
-/*    onValueChange(event){
+/*
+    onValueChange(event){
         this.setState({
-            this.props.opcion: event.target.value
+            selectedOption: event.target.value
         });
     }
 */
@@ -34,7 +35,6 @@ class RadioButton extends React.Component{
                             value="#"
                             checked={this.props.opcion === "#"}
                             onChange={this.props.onChange}
-                            //onChange={this.onValueChange}
                         />
                         #
                     </label>
