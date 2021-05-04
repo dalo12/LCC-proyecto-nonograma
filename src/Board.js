@@ -16,7 +16,7 @@ class Board extends React.Component {
         for(let i=0; i<numOfRowsTips; i++){
             for(let j=0; j<numOfColsTips; j++){
 
-                if(i == 0 || j == 0){
+                if(i === 0 || j === 0){
                     items.push(<Tip key={i + j}/>)
                 }else{
                     items.push(
