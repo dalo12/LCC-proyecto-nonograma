@@ -27,32 +27,32 @@ class RadioButton extends React.Component{
     render(){
         return(
             //<form onSubmit={this.formSubmit}>
-            <div>
+            /*<div>
                 <div className="radio">
                     <label>
                         <input
                             type="radio"
                             value="#"
-                            checked={this.props.opcion === "#"}
+                            checked={this.props.opcion === '#'}
                             onChange={this.props.onChange}
                         />
                         #
                     </label>
                 </div>
-
+*/
                 <div className="radio">
                     <label>
                         <input
                             type="radio"
-                            value="X"
-                            checked={this.props.opcion === "X"}
+                            value={this.props.value}
+                            checked={this.props.checked}
                             onChange={this.props.onChange}
                             //onChange={this.onValueChange}
                         />
-                        X
+                        {this.props.contenido}
                     </label>
                 </div>
-            </div>    
+          //  </div>    
             //</form>
            /* <div>
                 <form>

@@ -6,13 +6,16 @@ import RadioButton from './RadioButton';
 class Game extends React.Component {
 
   pengine;
+  variable;
 
   constructor(props) {
     super(props);
     this.state = {
       grid: null,
       waiting: false,
-      opcion: 'X'
+      opcion: 'X',
+      pistas_filas: null,
+      pistas_columnas: null,
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -21,11 +24,13 @@ class Game extends React.Component {
   }
 
   handlePengineCreate() {
-    const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
+    const queryS = 'init(PistasFilas, PistasColumnas, Grilla)';
     this.pengine.query(queryS, (success, response) => {
       if (success) {
         this.setState({
-          grid: response['Grilla']
+          grid: response['Grilla'],
+          pistas_filas: response['PistasFilas'],
+          pistas_columnas: response['PistasColumnas']
         });
       }
     });
@@ -68,20 +73,33 @@ class Game extends React.Component {
     if (this.state.grid === null) {
       return null;
     }
+
     const statusText = 'Keep playing!';
     return (
       <div className="game">
         <Board
           grid={this.state.grid}
           onClick={(i, j) => this.handleClick(i,j)}
+          pistas_filas = {this.state.pistas_filas}
+          pistas_columnas = {this.state.pistas_columnas}
         />
         <div className="gameInfo">
           {statusText}
         </div>
-        <RadioButton 
-          onChange={this.onValueChange}
-          // Nada por ahora
-        />
+        <div>
+          <RadioButton 
+            value= 'X'
+            checked={this.state.opcion === 'X'}
+            onChange={this.onValueChange}
+            contenido = "X"
+          />
+          <RadioButton
+            value= '#'
+            checked={this.state.opcion === '#'}
+            onChange={this.onValueChange}
+            contenido = "#"
+          />
+        </div>
       </div>
     );
   }

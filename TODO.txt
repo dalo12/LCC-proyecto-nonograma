@@ -1,3 +1,5 @@
 Interfaz gráfica:
-- [] Que los RadioButton sean seleccionables (en realidad son seleccionables, pero no se refleja en la GUI)
-- [] Mostrar las pistas
+- [x] Mostrar las pistas
+- [x] Que los RadioButton sean seleccionables (en realidad son seleccionables, pero no se refleja en la GUI)
+- [] Indicar visualmente si esta satisface las pistas asociadas
+- [] Detectar si se resolvió el nonograma
