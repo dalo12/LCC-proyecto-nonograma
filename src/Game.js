@@ -6,16 +6,15 @@ import RadioButton from './RadioButton';
 class Game extends React.Component {
 
   pengine;
-  variable;
 
   constructor(props) {
     super(props);
     this.state = {
       grid: null,
+      rowClues: null,
+      colClues: null,
       waiting: false,
-      opcion: 'X',
-      pistas_filas: null,
-      pistas_columnas: null,
+      opcion: '#',
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -24,13 +23,13 @@ class Game extends React.Component {
   }
 
   handlePengineCreate() {
-    const queryS = 'init(PistasFilas, PistasColumnas, Grilla)';
+    const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
     this.pengine.query(queryS, (success, response) => {
       if (success) {
         this.setState({
           grid: response['Grilla'],
-          pistas_filas: response['PistasFilas'],
-          pistas_columnas: response['PistasColumnas']
+          rowClues: response['PistasFilas'],
+          colClues: response['PistasColumns'],
         });
       }
     });
@@ -44,7 +43,7 @@ class Game extends React.Component {
     // Build Prolog query to make the move, which will look as follows:
     // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
-    const queryS = 'put("'+ this.state.opcion +'", [' + i + ',' + j + ']' 
+    const queryS = 'put("' + this.state.opcion + '", [' + i + ',' + j + ']' 
     + ', [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
     this.setState({
       waiting: true
@@ -63,6 +62,10 @@ class Game extends React.Component {
     });
   }
 
+  /**
+   * Manejador de eventos de RadioButton
+   * @param {} event Evento capturado
+   */
   onValueChange(event){
     this.setState({
         opcion: event.target.value
@@ -73,30 +76,29 @@ class Game extends React.Component {
     if (this.state.grid === null) {
       return null;
     }
-
     const statusText = 'Keep playing!';
     return (
       <div className="game">
         <Board
           grid={this.state.grid}
+          rowClues={this.state.rowClues}
+          colClues={this.state.colClues}
           onClick={(i, j) => this.handleClick(i,j)}
-          pistas_filas = {this.state.pistas_filas}
-          pistas_columnas = {this.state.pistas_columnas}
         />
         <div className="gameInfo">
           {statusText}
         </div>
-        <div>
-          <RadioButton 
-            value= 'X'
-            checked={this.state.opcion === 'X'}
-            onChange={this.onValueChange}
+        <div className="selectorOpcion">
+          <RadioButton
+            value = 'X'
+            checked = {this.state.opcion === 'X'}
+            onChange = {this.onValueChange}
             contenido = "X"
           />
           <RadioButton
-            value= '#'
-            checked={this.state.opcion === '#'}
-            onChange={this.onValueChange}
+            value = '#'
+            checked = {this.state.opcion === '#'}
+            onChange = {this.onValueChange}
             contenido = "#"
           />
         </div>
