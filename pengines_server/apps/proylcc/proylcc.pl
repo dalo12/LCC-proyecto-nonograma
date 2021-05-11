@@ -62,6 +62,48 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 	replace(_Cell, ColN, Contenido, Row, NewRow)).
 
 % verificar_pistas_filas(+PistasFilas, +RowN, +NewGrilla, -FilaSat)
+verificar_pistas_filas(PistasFilas, 0, [ [F | Fila] | _Grilla], FilaSat) :-
+	F = "#",
+	rafaga(PistasFilas, [F | Fila], FilaSat).
+
+verificar_pistas_filas(PistasFilas, 0, [ [F | Fila] | _Grilla], FilaSat) :-
+	F \= "#",
+	no_rafaga(PistasFilas, [F | Fila], FilaSat).
+
+verificar_pistas_filas(PistasFilas, RowN, [_Fila | Grilla], FilaSat) :-
+	RowNaux is RowN - 1,
+	verificar_pistas_filas(PistasFilas, RowNaux, Grilla, FilaSat). 
+
+rafaga([], [], 1).
+rafaga([PF | PFs], ["#" | Fila], FilaSat) :- 
+	PF > 0,
+	PFaux is PF - 1,
+	rafaga([PFaux | PFs], Fila, FilaSat).
+
+rafaga([PF | PFs], [F | Fila], FilaSat) :- 
+	F \= "#",
+	PF =< 0,
+	no_rafaga(PFs, [F | Fila], FilaSat).
+
+no_rafaga([], [], 1).
+no_rafaga(PF, [F | Fila], FilaSat) :- 
+	F \= "#",
+	no_rafaga(PF, Fila, FilaSat).
+no_rafaga(PF, [F | Fila], FilaSat) :-
+	F = "#",
+	rafaga(PF, [F | Fila], FilaSat).
+
+% verificar_pistas_columnas(+PistasColumnas, +ColN, +NewGrilla, -ColSat)
+/*
+	TODO: Para este lo que tengo que hacer es parcear el contenido de la columna
+	en una lista, luego usar verificar_pistas_filas()
+*/
+verificar_pistas_columnas(_PistasColumnas, _ColN, _NewGrilla, 1).
+
+
+
+/* V1: No anda, pero lo dejo por las dudas
+% verificar_pistas_filas(+PistasFilas, +RowN, +NewGrilla, -FilaSat)
 verificar_pistas_filas(PistasFilas, 0, [Fila | _Grilla], FilaSat) :- 
 	contar_contenido_fila(PistasFilas, Fila, FilaSat).
 verificar_pistas_filas(PistasFilas, RowN, [Fila | Grilla], FilaSat) :-
@@ -94,6 +136,7 @@ contar_contenido_fila(Pistas, [F | Fila], FilaSat) :-
 	Mentira, me detecta _ == "#" -> true. No sé por qué
 
 */
-
+/*
 % verificar_pistas_columnas(+PistasColumnas, +ColN, +NewGrilla, -ColSat)
 verificar_pistas_columnas(PistasColumnas, ColN, NewGrilla, 1).
+*/
