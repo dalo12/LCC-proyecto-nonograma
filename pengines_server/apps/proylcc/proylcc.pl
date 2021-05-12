@@ -23,7 +23,7 @@ replace(X, XIndex, Y, [Xi|Xs], [Xi|XsY]):-
 %
 % put(+Contenido, +Pos, +PistasFilas, +PistasColumnas, +Grilla, -GrillaRes, -FilaSat, -ColSat).
 %
-/* Métodos creados y modificados por nosotros */
+% Métodos creados y modificados por nosotros
 
 put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, FilaSat, ColSat):-
 	% NewGrilla es el resultado de reemplazar la fila Row en la posición RowN de Grilla
@@ -31,8 +31,6 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 	
 	replace(Row, RowN, NewRow, Grilla, NewGrilla),
 
-	verificar_pistas_filas(PistasFilas, RowN, NewGrilla, FilaSat),
-	verificar_pistas_columnas(PistasColumnas, ColN, NewGrilla, ColSat),
 
 	% NewRow es el resultado de reemplazar la celda Cell en la posición ColN de Row por _,
 	% siempre y cuando Cell coincida con Contenido (Cell se instancia en la llamada al replace/5).
@@ -42,15 +40,33 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 	(replace(Cell, ColN, _, Row, NewRow),
 	Cell == Contenido 
 		;
-	replace(_Cell, ColN, Contenido, Row, NewRow)).
+	replace(_Cell, ColN, Contenido, Row, NewRow)),
+
+	recuperar_pistas(RowN, PistasFilas, PF),
+	recuperar_pistas(ColN, PistasColumnas, PC),
+	verificar_pistas_filas(PF, RowN, NewGrilla, FilaSat),
+	verificar_pistas_columnas(PC, ColN, NewGrilla, ColSat).
+
+/**
+ * Dada una lista de listas de pistas, devuelve la lista de pista correspondiente
+ * a la posición pasada por parámetro
+ * @param {Pos} Posición (o índice) donde se encuentra la lista de pistas buscada
+ * @param {Pistas} Lista de listas de pistas
+ * @param {E} Lista de pista buscada
+ */
+% recuperar_pistas(+Pos, +Pistas, -E)
+recuperar_pistas(0, [P | _Ps], P).
+recuperar_pistas(Pos, [_P | Ps], E) :-
+	Posaux is Pos - 1,
+	recuperar_pistas(Posaux, Ps, E).
 
 /**
  * Verifica si se satisfacen las pistas de una fila dada
- * param {PistasFilas} Lista que contiene las pistas que debe satisfacer la fila
- * param {RowN} Número de la fila a verificar (0...length(Grilla))
- * param {Grilla} Grilla a validar
- * param {FilaSat} Retorna 1 si se satisfacen las pistas, nada en caso contrario
- * */
+ * @param {PistasFilas} Lista que contiene las pistas que debe satisfacer la fila
+ * @param {RowN} Número de la fila a verificar (0...length(Grilla))
+ * @param {Grilla} Grilla a validar
+ * @param {FilaSat} Retorna 1 si se satisfacen las pistas, nada en caso contrario
+ */
 % verificar_pistas_filas(+PistasFilas, +RowN, +NewGrilla, -FilaSat)
 verificar_pistas_filas(PistasFilas, 0, [ [F | Fila] | _Grilla], FilaSat) :-
 	F = "#",
@@ -66,12 +82,14 @@ verificar_pistas_filas(PistasFilas, RowN, [_Fila | Grilla], FilaSat) :-
 
 /**
  * Verifica una ráfaga de "#" se corresponde con su pista
- * param {PistasFilas} Lista con las pistas de la fila
- * param {Fila} Lista que representa la fila a verificar si se cumplen las pistas
- * param {FilaSat} Devuelve 1 si se satisfacen las pistas, nada en caso contrario
- * */
+ * @param {PistasFilas} Lista con las pistas de la fila
+ * @param {Fila} Lista que representa la fila a verificar si se cumplen las pistas
+ * @param {FilaSat} Devuelve 1 si se satisfacen las pistas, 0 en caso contrario
+ */
 % rafaga(+PistasFilas, +Fila, -FilaSat)
 rafaga([0], [], 1).
+rafaga([PF], [], 0) :- PF \= 0.
+% rafaga([0], [_PF | _PFs], 0).
 rafaga([PF | PFs], ["#" | Fila], FilaSat) :- 
 	PF > 0,
 	PFaux is PF - 1,
@@ -81,15 +99,19 @@ rafaga([PF | PFs], [F | Fila], FilaSat) :-
 	F \= "#",
 	PF =< 0,
 	no_rafaga(PFs, [F | Fila], FilaSat).
+rafaga([PF | _PFs], [F | _Fila], 0) :- 
+	F \= "#",
+	PF > 0.
 
 /**
  * Verifica que una ráfaga de "X" se corresponde con su pista
- * param {PistasFilas} Lista con las pistas de la fila
- * param {Fila} Lista que representa la fila a verificar si se cumplen las pistas
- * param {FilaSat} Devuelve 1 si se satisfacen las pistas, nada en caso contrario
- * */
+ * @param {PistasFilas} Lista con las pistas de la fila
+ * @param {Fila} Lista que representa la fila a verificar si se cumplen las pistas
+ * @param {FilaSat} Devuelve 1 si se satisfacen las pistas, 0 en caso contrario
+ */
 % no_rafaga(+PistasFilas, +Fila, -FilaSat)
 no_rafaga([], [], 1).
+no_rafaga([_PF | _PFs], [], 0).
 no_rafaga(PF, [F | Fila], FilaSat) :- 
 	F \= "#",
 	no_rafaga(PF, Fila, FilaSat).
@@ -99,11 +121,11 @@ no_rafaga(PF, [F | Fila], FilaSat) :-
 
 /**
  * Verifica si se satisfacen las pistas de una columna dada
- * param {PistasColumnas} Lista que contiene las pistas que debe satisfacer la columna
- * param {ColN} Número de la columna a verificar (0...length(Grilla[0]))
- * param {Grilla} Grilla a validar
- * param {ColSat} Retorna 1 si se satisfacen las pistas, nada en caso contrario
- * */
+ * @param {PistasColumnas} Lista que contiene las pistas que debe satisfacer la columna
+ * @param {ColN} Número de la columna a verificar (0...length(Grilla[0]))
+ * @param {Grilla} Grilla a validar
+ * @param {ColSat} Retorna 1 si se satisfacen las pistas, nada en caso contrario
+ */
 % verificar_pistas_columnas(+PistasColumnas, +ColN, +NewGrilla, -ColSat)
 verificar_pistas_columnas(PistasColumnas, ColN, Grilla, ColSat) :-
 	recuperar_columna(ColN, Grilla, Columna), 
@@ -112,10 +134,10 @@ verificar_pistas_columnas(PistasColumnas, ColN, Grilla, ColSat) :-
 /**
  * Método auxiliar recuperar_columna
  * Devuelve en una lista la columna deseada
- * param {ColN} Número de columna a buscar
- * param {Grilla} Grilla que contiene la columna buscada
- * param {Columna} Lista que contiene a la columna buscada
- * */
+ * @param {ColN} Número de columna a buscar
+ * @param {Grilla} Grilla que contiene la columna buscada
+ * @param {Columna} Lista que contiene a la columna buscada
+ */
 % recuperar_columna(+ColN, +Grilla, -Columna).
 recuperar_columna(_ColN, [], []).
 recuperar_columna(ColN, [G | Grilla], [E | Columna]) :-
@@ -125,10 +147,10 @@ recuperar_columna(ColN, [G | Grilla], [E | Columna]) :-
 /**
  * Método auxiliar recuperar_elemento
  * Devuelve un elemento en un índice dado de una lista
- * param {ColN} Índice donde se encuentra el elemento (0..length(Fila))
- * param {Fila} Lista donde buscar el elemento
- * param {E} Devuelve el elemento buscado
- * */
+ * @param {ColN} Índice donde se encuentra el elemento (0..length(Fila))
+ * @param {Fila} Lista donde buscar el elemento
+ * @param {E} Devuelve el elemento buscado
+ */
 % recuperar_elemento(+ColN, +Fila, -E).
 recuperar_elemento(0, [F | _Fila], F).
 recuperar_elemento(ColN, [_F | Fila], E) :-
