@@ -31,12 +31,23 @@ class Game extends React.Component {
         this.setState({
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
-          colClues: response['PistasColumns'],
+          colClues: response['PistasColumns']
         });
+
+        let satisfaccion_filas_aux = [];
+        let satisfaccion_cols_aux = [];
+
         for(let i=0; i<this.state.grid.length; i++){
-          this.state.satisfaccion_filas[i] = 0;
-          this.state.satisfaccion_cols[i] = 0;
+          satisfaccion_filas_aux[i] = 0;
+          satisfaccion_cols_aux[i] = 0;
         }
+
+        this.setState({
+          satisfaccion_filas: satisfaccion_filas_aux,
+          satisfaccion_cols: satisfaccion_cols_aux
+        }
+        );
+
       }
     });
   }
@@ -65,17 +76,23 @@ class Game extends React.Component {
     });
     this.pengine.query(queryS, (success, response) => {
       if (success) {
-        //let grilla =  response['GrillaRes'];
         this.setState({
-          //grid: JSON.stringify(grilla).replaceAll('"F"', "_"),
           grid: response['GrillaRes'],
           waiting: false
         });
 
-        this.state.satisfaccion_filas[i] = response['FilaSat'];
-        this.state.satisfaccion_cols[i] = response['ColSat'];
-        console.log(response['FilaSat']);
-        console.log(response['ColSat']);
+        let satisfaccion_filas_aux = this.state.satisfaccion_filas;
+        let satisfaccion_cols_aux = this.state.satisfaccion_cols;
+
+        satisfaccion_filas_aux[i] = response['FilaSat'];
+        satisfaccion_cols_aux[i] = response['ColSat'];
+        
+        this.setState({
+          satisfaccion_filas: satisfaccion_filas_aux,
+          satisfaccion_cols: satisfaccion_cols_aux
+        });
+
+        console.log(this.state.grid)
 
       } else {
         this.setState({
@@ -131,11 +148,43 @@ formatear_pista(pista_bruto){
   return pistas_formateada;
 }
 
+/**
+ * Analiza el estado de satisfacción de las filas y de las columnas y retorna
+ * verdadero si se satisfacen todas las pistas, falso en caso contrario
+ * @param {*} satisfaccion_filas Arreglo con el estado de satisfacción de las
+ * pistas de las filas
+ * @param {*} satisfaccion_cols Arreglo con el estado de satisfacción de las
+ * pistas de las columnas
+ * @returns Verdadero si se satisfacen todas las pistas, falso en caso contrario
+ */
+ganado(satisfaccion_filas, satisfaccion_cols){
+  let filas_satisfechas = true;
+  let i = 0;
+  while(filas_satisfechas && i<satisfaccion_filas.length){
+    filas_satisfechas = (satisfaccion_filas[i] === 1);
+    i++;
+  }
+
+  let cols_satisfechas = true;
+  i = 0;
+  while(filas_satisfechas && cols_satisfechas && i<cols_satisfechas.length){
+    cols_satisfechas = (satisfaccion_cols[i] === 1);
+    i++;
+  }
+
+  return (filas_satisfechas && cols_satisfechas);
+}
+
   render() {
     if (this.state.grid === null) {
       return null;
     }
-    const statusText = 'Keep playing!';
+    
+    let statusText = 'Keep playing!';
+    if(this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)){
+      statusText = 'Has ganado!'
+    }
+
     return (
       <div className="game">
         <Board

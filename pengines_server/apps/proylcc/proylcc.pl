@@ -88,7 +88,7 @@ verificar_pistas_filas(PistasFilas, RowN, [_Fila | Grilla], FilaSat) :-
  */
 % rafaga(+PistasFilas, +Fila, -FilaSat)
 rafaga([0], [], 1).
-rafaga([PF], [], 0) :- PF \= 0.
+rafaga([0 | PFs], [], 0) :- PFs \= [].
 % rafaga([0], [_PF | _PFs], 0).
 rafaga([PF | PFs], ["#" | Fila], FilaSat) :- 
 	PF > 0,
@@ -99,9 +99,10 @@ rafaga([PF | PFs], [F | Fila], FilaSat) :-
 	F \= "#",
 	PF =< 0,
 	no_rafaga(PFs, [F | Fila], FilaSat).
-rafaga([PF | _PFs], [F | _Fila], 0) :- 
+rafaga([PF | PFs], [F | Fila], FilaSat) :- 
 	F \= "#",
-	PF > 0.
+	PF > 0,
+	no_rafaga([PF | PFs], [F | Fila], FilaSat).
 
 /**
  * Verifica que una ráfaga de "X" se corresponde con su pista
@@ -174,42 +175,4 @@ put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0
 	Cell == Contenido 
 		;
 	replace(_Cell, ColN, Contenido, Row, NewRow)).
-*/
-% V1: No anda, pero lo dejo por las dudas
-% verificar_pistas_filas(+PistasFilas, +RowN, +NewGrilla, -FilaSat)
-/* verificar_pistas_filas(PistasFilas, 0, [Fila | _Grilla], FilaSat) :- 
-	contar_contenido_fila(PistasFilas, Fila, FilaSat).
-verificar_pistas_filas(PistasFilas, RowN, [Fila | Grilla], FilaSat) :-
-	RowNAux is RwN - 1,
-	verificar_pistas_filas(PistasFilas, RowNAux, Grilla, FilaSat).
-*/
-% contar_contenido_fila(+Pistas, +Fila, -FilaSat)
-/*contar_contenido_fila([], [], 1).
-contar_contenido_fila([P | Pistas], [F | Fila], FilaSat) :-
-	F = "#",
-	Paux is P - 1,
-	Paux > 0,
-	contar_contenido_fila([Paux | Pistas], Fila, FilaSat).
-contar_contenido_fila([P | Pistas], [F | Fila], FilaSat) :-
-	F = "#",
-	Paux is P - 1,
-	Paux =< 0,
-	contar_contenido_fila(Pistas, Fila, FilaSat).
-contar_contenido_fila(Pistas, [F | Fila], FilaSat) :-
-	F \= "#",
-	contar_contenido_fila(Pistas, Fila, FilaSat).
-*/
-/*
-	TODO: Es una aproximación, pero falla en el caso de
-	?- verificar_pistas_filas([3], 0, [["X","#","#","X","#"]], FilaSat).
-	FilaSat = 1.
-
-	Ahí debería fallar, pero no lo hace
-	En el resto de los casos anda bien.
-	Mentira, me detecta _ == "#" -> true. No sé por qué
-
-*/
-/*
- verificar_pistas_columnas(+PistasColumnas, +ColN, +NewGrilla, -ColSat)
-verificar_pistas_columnas(PistasColumnas, ColN, NewGrilla, 1).
 */
