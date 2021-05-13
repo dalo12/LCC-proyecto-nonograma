@@ -85,7 +85,7 @@ class Game extends React.Component {
         let satisfaccion_cols_aux = this.state.satisfaccion_cols;
 
         satisfaccion_filas_aux[i] = response['FilaSat'];
-        satisfaccion_cols_aux[i] = response['ColSat'];
+        satisfaccion_cols_aux[j] = response['ColSat'];
         
         this.setState({
           satisfaccion_filas: satisfaccion_filas_aux,
@@ -93,7 +93,8 @@ class Game extends React.Component {
         });
 
         console.log(this.state.grid)
-
+        console.log(this.state.satisfaccion_filas);
+        console.log(this.state.satisfaccion_cols);
       } else {
         this.setState({
           waiting: false

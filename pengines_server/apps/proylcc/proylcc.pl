@@ -99,6 +99,10 @@ rafaga([0], [], 1).
 rafaga([PF | _PFs], [F | _Fila], 0) :-
 	F \= "#",
 	PF > 0.
+rafaga([0 | PFs], [], 0) :-
+	PFs \= [].
+rafaga([PF | _PFs], [], 0) :-
+	PF \= 0.
 
 /**
  * Verifica que una ráfaga de "X" se corresponde con su pista
