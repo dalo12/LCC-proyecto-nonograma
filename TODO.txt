@@ -9,3 +9,5 @@ Bugs:
 - [x] Hacer que se borre donde clickeas
 - [x] Hacer que el usuario no pueda seguir clickeando en caso de victoria (opcional)
 - [] Implementar otro init.pl
+- [] Documentación
+- [] Documentar el state del reactjs

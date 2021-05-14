@@ -73,4 +73,26 @@ body {
 
 .gameInfo {
   margin-left: 20px;
+  margin-top: 70px;
+  font-weight: bold;
+}
+
+.radio{
+  color: #344861;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.selectorOpcion{
+  width: 50px;
+  margin-left: 55px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.global{
+  display: flex;
+  flex-direction: column;
 }

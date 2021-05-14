@@ -93,10 +93,6 @@ class Game extends React.Component {
           satisfaccion_cols: satisfaccion_cols_aux,
           victoria: this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)
         });
-
-        console.log(this.state.grid)
-        console.log(this.state.satisfaccion_filas);
-        console.log(this.state.satisfaccion_cols);
       } else {
         this.setState({
           waiting: false
@@ -191,35 +187,37 @@ ganado(satisfaccion_filas, satisfaccion_cols){
     }
 
     return (
-      <div className="game">
-        <Board
-          grid={this.state.grid}
-          rowClues={this.state.rowClues}
-          colClues={this.state.colClues}
-          onClick={(i, j) => this.handleClick(i,j)}
+      <div className="global">
+        <div className="game">
+          <Board
+            grid={this.state.grid}
+            rowClues={this.state.rowClues}
+            colClues={this.state.colClues}
+            onClick={(i, j) => this.handleClick(i,j)}
 
-          seguir_jugando = {!this.state.victoria}
-          satisfaccion_filas = {this.state.satisfaccion_filas}
-          satisfaccion_cols = {this.state.satisfaccion_cols}
-        />
-        <div className="gameInfo">
-          {statusText}
-        </div>
-        <div className="selectorOpcion">
-          <RadioButton
-            value = 'X'
-            checked = {this.state.opcion === 'X'}
-            onChange = {this.onValueChange}
-            contenido = "X"
+            seguir_jugando = {!this.state.victoria}
+            satisfaccion_filas = {this.state.satisfaccion_filas}
+            satisfaccion_cols = {this.state.satisfaccion_cols}
           />
-          <RadioButton
-            value = '#'
-            checked = {this.state.opcion === '#'}
-            onChange = {this.onValueChange}
-            contenido = "◼"
-          />
+          <div className="gameInfo">
+            {statusText}
+          </div>
         </div>
-      </div>
+          <div className="selectorOpcion">
+            <RadioButton
+              value = 'X'
+              checked = {this.state.opcion === 'X'}
+              onChange = {this.onValueChange}
+              contenido = "X"
+            />
+            <RadioButton
+              value = '#'
+              checked = {this.state.opcion === '#'}
+              onChange = {this.onValueChange}
+              contenido = "◼"
+            />
+          </div>
+        </div>
     );
   }
 }
