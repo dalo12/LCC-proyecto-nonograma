@@ -118,6 +118,7 @@ no_rafaga(PF, [F | Fila], FilaSat) :-
 	F \= "#",
 	no_rafaga(PF, Fila, FilaSat).
 no_rafaga([], [], 1).
+no_rafaga([], ["#" | _Fila], 0).
 no_rafaga([_PF | _PFs], [], 0).
 
 /**
