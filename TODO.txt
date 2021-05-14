@@ -3,11 +3,12 @@ Interfaz gráfica:
 - [x] Que los RadioButton sean seleccionables (en realidad son seleccionables, pero no se refleja en la GUI)
 - [x] Indicar visualmente si esta satisface las pistas asociadas
 - [x] Detectar si se resolvió el nonograma
+- [ ] Preguntar si el put/8 tiene que generar una única respuesta o puede generar muchas
 
 Bugs:
 - [x] Hacer que deje de andar extraño
 - [x] Hacer que se borre donde clickeas
 - [x] Hacer que el usuario no pueda seguir clickeando en caso de victoria (opcional)
-- [] Implementar otro init.pl
-- [] Documentación
-- [] Documentar el state del reactjs
+- [x] Implementar otro init.pl
+- [ ] Documentación
+- [ ] Documentar el state del reactjs
