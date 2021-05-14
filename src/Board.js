@@ -58,6 +58,8 @@ class Board extends React.Component {
                                     value={cell}
                                     onClick={() => this.props.onClick(i, j)}
                                     key={i + j}
+
+                                    seguir_jugando = {this.props.seguir_jugando}
                                 />
                             )
                         )}

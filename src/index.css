@@ -12,6 +12,11 @@ body {
   margin-top: -1px;
   padding: 0;
   text-align: center;
+  color: #344861;
+}
+
+.relleno{
+  background-color: #344861;
 }
 
 .square:focus {
@@ -43,7 +48,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #b9d6e0;
+  background: #eaeef8;
+  /*background: #b9d6e0;*/
   border-radius: 8px;
   margin: 5px;
 }
@@ -57,7 +63,7 @@ body {
 }
 
 .sat {
-  background-color: greenyellow;
+  background-color: #d1ff8a;
 }
 
 .game {

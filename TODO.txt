@@ -6,4 +6,6 @@ Interfaz gráfica:
 
 Bugs:
 - [x] Hacer que deje de andar extraño
-- [] Hacer que se borre donde clickeas
+- [x] Hacer que se borre donde clickeas
+- [x] Hacer que el usuario no pueda seguir clickeando en caso de victoria (opcional)
+- [] Implementar otro init.pl

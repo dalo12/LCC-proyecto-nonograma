@@ -1,5 +1,7 @@
 - ¿Hay alguna manera de verificar si una variable en Prolog fue instanciada?
+- Tengo problemas con el tema de borrar las "X" y los "#"
 - Si el juego fue ganado o no ¿se debe verificar desde Prolog o lo puedo verificar
 desde Javascript?
 - ¿Qué tan detallada debe ser la documentación? ¿Hay que documentar cada función
 que implementamos?
+- ¿Hay que hacerle algo más como niveles y esas cosas o con esto alcanza?

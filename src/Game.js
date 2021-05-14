@@ -16,7 +16,8 @@ class Game extends React.Component {
       waiting: false,
       opcion: '#',
       satisfaccion_filas: [],
-      satisfaccion_cols: []
+      satisfaccion_cols: [],
+      victoria: false
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -61,7 +62,7 @@ class Game extends React.Component {
     // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
     // const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
     
-    const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', '"F"')
+    const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', '_')
 
     let pistas_filas = this.formatear_pista(this.state.rowClues);
     let pistas_columnas = this.formatear_pista(this.state.colClues);
@@ -89,7 +90,8 @@ class Game extends React.Component {
         
         this.setState({
           satisfaccion_filas: satisfaccion_filas_aux,
-          satisfaccion_cols: satisfaccion_cols_aux
+          satisfaccion_cols: satisfaccion_cols_aux,
+          victoria: this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)
         });
 
         console.log(this.state.grid)
@@ -167,10 +169,12 @@ ganado(satisfaccion_filas, satisfaccion_cols){
   }
 
   let cols_satisfechas = true;
-  i = 0;
-  while(filas_satisfechas && cols_satisfechas && i<cols_satisfechas.length){
-    cols_satisfechas = (satisfaccion_cols[i] === 1);
-    i++;
+  if(filas_satisfechas){
+    i = 0;
+    while(cols_satisfechas && i<satisfaccion_cols.length){
+      cols_satisfechas = (satisfaccion_cols[i] === 1);
+      i++;
+    }
   }
 
   return (filas_satisfechas && cols_satisfechas);
@@ -182,8 +186,8 @@ ganado(satisfaccion_filas, satisfaccion_cols){
     }
     
     let statusText = 'Keep playing!';
-    if(this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)){
-      statusText = 'Has ganado!'
+    if(this.state.victoria){
+      statusText = 'Has ganado!';
     }
 
     return (
@@ -194,6 +198,7 @@ ganado(satisfaccion_filas, satisfaccion_cols){
           colClues={this.state.colClues}
           onClick={(i, j) => this.handleClick(i,j)}
 
+          seguir_jugando = {!this.state.victoria}
           satisfaccion_filas = {this.state.satisfaccion_filas}
           satisfaccion_cols = {this.state.satisfaccion_cols}
         />
@@ -211,7 +216,7 @@ ganado(satisfaccion_filas, satisfaccion_cols){
             value = '#'
             checked = {this.state.opcion === '#'}
             onChange = {this.onValueChange}
-            contenido = "#"
+            contenido = "◼"
           />
         </div>
       </div>

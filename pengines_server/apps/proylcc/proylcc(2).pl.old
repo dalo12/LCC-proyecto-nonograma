@@ -73,7 +73,7 @@ verificar_pistas_filas([PF | PFs], 0, [ [F | Fila] | _Grilla ], FilaSat) :-
 	rafaga([PFaux | PFs], Fila, FilaSat).
 verificar_pistas_filas([0 | _PFs], 0, [ [F | _Fila] | _Grilla ], 0) :- 
 	F == "#".
-verificar_pistas_filas(PistasFilas, 0, [ [_ | Fila] | _Grilla ], FilaSat) :-
+verificar_pistas_filas(PistasFilas, 0, [ [F | Fila] | _Grilla ], FilaSat) :-
 	%F \= "#",
 	no_rafaga(PistasFilas, Fila, FilaSat).
 
@@ -92,20 +92,20 @@ rafaga([PF | PFs], [F | Fila], FilaSat) :-
 	F == "#",
 	PFaux is PF - 1,
 	rafaga([PFaux | PFs], Fila, FilaSat).
-rafaga([PF | PFs], [_ | Fila], FilaSat) :-
-	PF == 0,
+rafaga([PF | PFs], [F | Fila], FilaSat) :-
+	PF = 0,
 	%F \= "#",
 	no_rafaga(PFs, Fila, FilaSat).
 rafaga([0 | _PFs], [F | _Fila], 0) :- 
 	F == "#".
 rafaga([0], [], 1).
-rafaga([PF | _PFs], [_ | _Fila], 0) :-
+rafaga([PF | _PFs], [F | _Fila], 0) :-
 	%F \= "#",
-	PF \== 0.
+	PF > 0.
 rafaga([0 | PFs], [], 0) :-
-	PFs \== [].
+	PFs \= [].
 rafaga([PF | _PFs], [], 0) :-
-	PF \== 0.
+	PF \= 0.
 
 /**
  * Verifica que una ráfaga de "X" se corresponde con su pista
@@ -114,17 +114,17 @@ rafaga([PF | _PFs], [], 0) :-
  * @param {FilaSat} Devuelve 1 si se satisfacen las pistas, 0 en caso contrario
  */
 % no_rafaga(+PistasFilas, +Fila, -FilaSat)
-no_rafaga([], [], 1).
-no_rafaga([], [F | _Fila], 0) :- 
-	F == "#".
-no_rafaga([_PF | _PFs], [], 0).
 no_rafaga([PF | PFs], [F | Fila], FilaSat) :-
 	F == "#",
 	PFaux is PF - 1,
 	rafaga([PFaux | PFs], Fila, FilaSat).
-no_rafaga(PF, [_ | Fila], FilaSat) :-
+no_rafaga(PF, [F | Fila], FilaSat) :-
 	%F \= "#",
 	no_rafaga(PF, Fila, FilaSat).
+no_rafaga([], [], 1).
+no_rafaga([], [F | _Fila], 0) :- 
+	F == "#".
+no_rafaga([_PF | _PFs], [], 0).
 
 /**
  * Verifica si se satisfacen las pistas de una columna dada
