@@ -1,4 +1,6 @@
 /*
+    ESTA PSEUDO IDEA FUE DEPRECADA
+    EN SU LUGAR CONSULTAR EL ARCHIVO 'pseudo_idea_refinada.pl'
     Pseudo idea de cómo resolver las filas.
     En una matriz de 5x5 (por ejemplo)
     Anda bien en los casos:
