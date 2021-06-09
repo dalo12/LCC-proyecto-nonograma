@@ -96,3 +96,14 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.buttonSolution{
+  padding: 50px;
+}
+
+.boton{
+  font-size: 20px;
+  color:blue;
+  font-style: italic;
+  padding: 10px;
+}

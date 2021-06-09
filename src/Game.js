@@ -2,6 +2,7 @@ import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
 import RadioButton from './RadioButton';
+import { queryByTestId } from '@testing-library/dom';
 
 class Game extends React.Component {
 
@@ -10,6 +11,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      grid_aux: null,
       grid: null,
       rowClues: null,
       colClues: null,
@@ -17,11 +19,13 @@ class Game extends React.Component {
       opcion: '#',
       satisfaccion_filas: [],
       satisfaccion_cols: [],
-      victoria: false
+      victoria: false,
+      tablero_solucion_off: true
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
+    this.mostrarSolucion = this.mostrarSolucion.bind(this);
     this.pengine = new PengineClient(this.handlePengineCreate);
   }
 
@@ -176,6 +180,33 @@ ganado(satisfaccion_filas, satisfaccion_cols){
   return (filas_satisfechas && cols_satisfechas);
 }
 
+mostrarSolucion(){
+    this.setState({
+        tablero_solucion_off: !this.state.tablero_solucion_off
+      }
+    )
+    //Si se debe mostrar el tablero solucion, entonces reemplazar grilla por su solucion
+    if (this.state.tablero_solucion_off){
+      const queryS = 'grillaSolucion(GrillaSolucion)';      
+      this.pengine.query(queryS, (success, response) => {
+        if (success) {
+          this.setState({
+            grid_aux: this.state.grid,
+            grid: response['GrillaSolucion'],
+            waiting: true //Desabilita el clickeado de los cuadrados
+          });
+        }
+      });
+    }
+    else{
+      this.setState({
+        grid: this.state.grid_aux,
+        grid_aux: null,
+        waiting: false //Habilita el clickeado de los cuadrados
+      })
+    }
+}
+
   render() {
     if (this.state.grid === null) {
       return null;
@@ -185,6 +216,8 @@ ganado(satisfaccion_filas, satisfaccion_cols){
     if(this.state.victoria){
       statusText = 'Has ganado!';
     }
+
+    let texto = (this.state.tablero_solucion_off) ? "Mostrar solución" : "Ocultar solución";
 
     return (
       <div className="global">
@@ -217,6 +250,11 @@ ganado(satisfaccion_filas, satisfaccion_cols){
               contenido = "◼"
             />
           </div>
+          
+          <div className="buttonSolution">
+              <button className="boton" onClick={this.mostrarSolucion}> {texto} </button>
+          </div>
+          
         </div>
     );
   }
