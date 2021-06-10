@@ -1,7 +1,5 @@
-:- module(proylcc,
-	[  
-		put/8
-	]).
+:- module(proylcc, [put/8, revelarCelda/7]).
+:- use_module(proylcc:init).
 
 :-use_module(library(lists)).
 
@@ -182,3 +180,37 @@ put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0
 		;
 	replace(_Cell, ColN, Contenido, Row, NewRow)).
 */
+
+
+/*
+* ========================================================================================================
+* PREDICADO PARA REVELAR EL VALOR DE LA CELDA
+* ========================================================================================================
+*/
+
+/*
+* Predicado revelarCelda/7
+* Busca el elemento de la grilla solucion de la posicion [Fila, Columna] y actualiza el tablero empleando put/8
+*/
+revelarCelda(Grilla, [RowN, ColN], PistasFilas, PistasColumnas, NewGrilla, FilaSat, ColSat):-
+    init:grillaSolucion(GrillaSolucion),
+    buscarFila(GrillaSolucion, RowN, ListaFila),
+    buscarElemento(ListaFila, ColN, Contenido),
+    put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, FilaSat, ColSat),!.
+
+/*
+* Busca la fila del elemento.
+*/
+buscarFila([[F|Fila]|_], 0, [F|Fila]):-!.
+buscarFila([[_F|_Fila]|Grilla], PosFila, ListaFila):-
+    Pos is PosFila-1,
+    buscarFila(Grilla, Pos, ListaFila).
+
+
+/*
+* Busca el elemento de la posicion indicada por Columna y lo retorna.
+*/
+buscarElemento([X|_], 0, X):-!.
+buscarElemento([_X|Y], Columna, Elemento):-
+    Col is Columna-1,
+    buscarElemento(Y, Col, Elemento).

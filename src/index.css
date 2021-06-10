@@ -97,11 +97,11 @@ body {
   flex-direction: column;
 }
 
-.buttonSolution{
-  padding: 50px;
+.buttonSolution, .buttonSolutionCell{
+  padding: 20px;
 }
 
-.boton{
+.boton, .botonCell{
   font-size: 20px;
   color:blue;
   font-style: italic;

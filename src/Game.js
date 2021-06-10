@@ -20,12 +20,14 @@ class Game extends React.Component {
       satisfaccion_filas: [],
       satisfaccion_cols: [],
       victoria: false,
-      tablero_solucion_off: true
+      tablero_solucion_off: true,
+      resolver_celda_on: false
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
     this.mostrarSolucion = this.mostrarSolucion.bind(this);
+    this.descubrirCelda = this.descubrirCelda.bind(this);
     this.pengine = new PengineClient(this.handlePengineCreate);
   }
 
@@ -71,8 +73,17 @@ class Game extends React.Component {
     let pistas_filas = this.formatear_pista(this.state.rowClues);
     let pistas_columnas = this.formatear_pista(this.state.colClues);
 
-    const queryS = 'put("' + this.state.opcion + '", [' + i + ',' + j + ']' 
-    + ', ' + pistas_filas + ', ' + pistas_columnas + ',' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+    let queryS = null;
+    
+    if (!this.state.resolver_celda_on){
+        queryS = 'put("' + this.state.opcion + '", [' + i + ',' + j + ']' 
+           + ', ' + pistas_filas + ', ' + pistas_columnas + ',' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+    }
+    else{
+      //revelarCelda(Grilla, [RowN, ColN], PistasFilas, PistasColumnas, NewGrilla, FilaSat, ColSat)
+        queryS = 'revelarCelda(' + squaresS + ', [' + i + ',' + j + ']' 
+          + ', ' + pistas_filas + ', ' + pistas_columnas + ', GrillaRes, FilaSat, ColSat)';
+    }
 
     console.log(queryS);
 
@@ -97,12 +108,20 @@ class Game extends React.Component {
           satisfaccion_cols: satisfaccion_cols_aux,
           victoria: this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)
         });
+
       } else {
         this.setState({
           waiting: false
         });
       }
     });
+
+    if (this.state.resolver_celda_on){
+      this.setState({
+        resolver_celda_on: false
+      });
+      alert("Valor revelado en la celda ("+ i + ", " + j + ")");
+    }
   }
 
   /**
@@ -207,6 +226,13 @@ mostrarSolucion(){
     }
 }
 
+descubrirCelda(){
+  alert("Seleccione una casilla vacía para revelar su valor")
+  this.setState({
+    resolver_celda_on: true
+  });
+}
+
   render() {
     if (this.state.grid === null) {
       return null;
@@ -217,7 +243,8 @@ mostrarSolucion(){
       statusText = 'Has ganado!';
     }
 
-    let texto = (this.state.tablero_solucion_off) ? "Mostrar solución" : "Ocultar solución";
+    let textoBotonSolucion = (this.state.tablero_solucion_off) ? "Mostrar solución" : "Ocultar solución";
+    let textoBotonCelda = (this.state.resolver_celda_on) ? "Resolviendo celda" : "Resolver celda";
 
     return (
       <div className="global">
@@ -252,7 +279,11 @@ mostrarSolucion(){
           </div>
           
           <div className="buttonSolution">
-              <button className="boton" onClick={this.mostrarSolucion}> {texto} </button>
+              <button className="boton" onClick={this.mostrarSolucion}> {textoBotonSolucion} </button>
+          </div>
+
+          <div className="buttonSolutionCell">
+              <button className="botonCell" onClick={this.descubrirCelda}> {textoBotonCelda} </button>
           </div>
           
         </div>
