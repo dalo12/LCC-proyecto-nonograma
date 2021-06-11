@@ -5,3 +5,14 @@ desde Javascript?
 - ¿Qué tan detallada debe ser la documentación? ¿Hay que documentar cada función
 que implementamos?
 - ¿Hay que hacerle algo más como niveles y esas cosas o con esto alcanza?
+
+-------
+
+- ¿La resolución puede ir en el init.pl o tiene que ir si o si en otro archivo?
+- ¿Se puede usar el '!' (cut)? 
+- ¿Es necesario arreglar todos los problemas que nos marcaron en la entrega?
+- ¿El 'revelar pistas' tiene que estar basado en la resolución?
+- ¿Debe verificarse que al revelar pista se haga click sobre una celda vacía? Si
+
+Aclaraciones:
+    - Hacer un informe nuevo
