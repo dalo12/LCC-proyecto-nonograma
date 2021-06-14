@@ -1,3 +1,27 @@
+/**
+ * Dada una grilla, la resuelve
+ * @param PistasFilas Lista con listas de pistas de las filas de la grilla
+ * @param PistasColumnas Lista con listas de pistas de las columnas de la grilla
+ * @param Fila Número de fila actual que se intenta resolver
+ * @param Col Número de columna que se intenta resolver 
+ * @param Modo Modo de resolución. Puede ser fila o columna
+ * @param Res Grilla resultante luego de resolverla.
+*/
+
+resolver([], [], Grilla, _Fila, _Col, _Modo, Grilla).
+resolver([PF | PistasFilas], PistasColumnas, Grilla, Fila, Col, fila, Res) :-
+    resolver_fila(PF, Fila, Grilla, R),
+    Fila_aux is Fila + 1,
+    resolver(PistasFilas, PistasColumnas, R, Fila_aux, Col, columna, Res).
+resolver(PistasFilas, [PC | PistasColumnas], Grilla, Fila, Col, columna, Res) :-
+    resolver_columna(PC, Col, Grilla, R),
+    Col_aux is Col + 1,
+    resolver(PistasFilas, PistasColumnas, R, Fila, Col_aux, fila, Res).
+resolver(PistasFilas, [], Grilla, Fila, Col, columna, Res) :-
+    resolver(PistasFilas, [], Grilla, Fila, Col, fila, Res).
+resolver([], PistasColumnas, Grilla, Fila, Col, fila, Res) :- 
+    resolver([], PistasColumnas, Grilla, Fila, Col, columna, Res).
+
 % 
 % resolver_fila/4
 % resolver_fila(+PistasFila, +N_Fila, +Grilla, -Res)
@@ -98,34 +122,30 @@ resolver_columna([], _N_Col, _Index, [], _Cabeza, no_rafaga, []).
 resolver_columna(Pistas, N_Col, Index, [[F | Fila] | Grilla], Cabeza, no_rafaga, Res) :-
     N_Col > Index,
     Index_aux is Index + 1,
-    append([F], Cabeza, Cabeza_aux),
+    append(Cabeza, [F], Cabeza_aux),
     resolver_columna(Pistas, N_Col, Index_aux, [Fila | Grilla], Cabeza_aux, no_rafaga, Res).
 resolver_columna(Pistas, N_Col, Index, [[F | Fila] | Grilla], Cabeza, rafaga, Res) :-
     N_Col > Index,
     Index_aux is Index + 1,
-    append([F], Cabeza, Cabeza_aux),
+    append(Cabeza, [F], Cabeza_aux),
     resolver_columna(Pistas, N_Col, Index_aux, [Fila | Grilla], Cabeza_aux, rafaga, Res).
 resolver_columna(Pistas, N_Col, N_Col, [[F | Fila] | Grilla], Cabeza, no_rafaga, [R | Res]) :-
     F \== "#",
     resolver_columna(Pistas, N_Col, 0, Grilla, [], no_rafaga, Res),
-    append(["X"], Fila, Raux),
-    append(Cabeza, Raux, R).
+    append(Cabeza, ["X" | Fila], R).
 resolver_columna([P | Pistas], N_Col, N_Col, [[F | Fila] | Grilla], Cabeza, no_rafaga, [R | Res]) :-
     P > 0,
     P_Aux is P - 1,
     F \== "X",
     resolver_columna([P_Aux | Pistas], N_Col, 0, Grilla, [], rafaga, Res),
-    append(["#"], Fila, Raux),
-    append(Cabeza, Raux, R).
+    append(Cabeza, ["#" | Fila], R).
 resolver_columna([P | Pistas], N_Col, N_Col, [[F | Fila] | Grilla], Cabeza, rafaga, [R | Res]) :-
     F \== "X",
     P > 0,
     P_Aux is P - 1,
     resolver_columna([P_Aux | Pistas], N_Col, 0, Grilla, [], rafaga, Res),
-    append(["#"], Fila, Raux),
-    append(Cabeza, Raux, R).
+    append(Cabeza, ["#" | Fila], R).
 resolver_columna([0 | Pistas], N_Col, N_Col, [[F | Fila] | Grilla], Cabeza, rafaga, [R | Res]) :-
     F \== "#",
     resolver_columna(Pistas, N_Col, 0, Grilla, [], no_rafaga, Res),
-    append(["X"], Fila, Raux),
-    append(Cabeza, Raux, R).
+    append(Cabeza, ["X" | Fila], R).
