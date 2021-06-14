@@ -1,3 +1,85 @@
+%
+% calcular_restricciones/2
+% calcular_restricciones(+Pistas, -Suma)
+%
+% Debe ser invocado de la siguiente manera:
+% calcular_restricciones([[lista de naturales], ...], R)
+%
+/**
+ * Dada una lista de pistas, calcula la cantidad mínima de celdas que ocuparía la 
+ * solución de cada una
+ * @param Pistas Lista de listas de naturales que representan las pistas de las celdas
+ * @param Suma Suma resultante que indica la cantidad mínima de celdas que ocuparía la
+ * solución de las pistas
+ */ 
+calcular_restricciones([], []).
+calcular_restricciones([P | Pistas], [Suma | Res]) :-
+    sumar_pistas(P, Suma),
+    calcular_restricciones(Pistas, Res).
+
+%
+% sumar_pistas/2
+% sumar_pistas(+Pistas, -Suma)
+%
+% Debe ser invocado de la siguiente manera:
+% sumar_pistas([lista de naturales], R)
+%
+/**
+ * Dada una pista, retorna la cantidad mínima de celdas que ocuparía su solución
+ * @param Pistas Lista de naturales que representa las pistas
+ * @param Suma Suma resultante que indica la cantidad mínima de celdas que ocuparía
+ * la solución de las pistas
+ */ 
+sumar_pistas([], 0).
+sumar_pistas([P | Pistas], Suma) :-
+    Pistas \== [],
+    sumar_pistas(Pistas, Suma_aux),
+    Suma is Suma_aux + P + 1, % sumo 1 por cada espacio vacío
+    !. % para que no me genere más respuestas de las necesarias.
+       % por ej. para [1,1] me retornaba 3 y luego 2. Con este cut evito eso
+sumar_pistas([P | Pistas], Suma) :-
+    sumar_pistas(Pistas, Suma_aux),
+    Suma is Suma_aux + P.
+
+ordenar(Lista, R) :-
+    mayor(Lista, M),
+    longitud(Lista, Long),
+    ordenar_aux(Lista, M, 0, Long, R).
+
+ordenar_aux(_Lista, _Mayor, Indice, Indice, []).
+ordenar_aux(Lista, Mayor, Indice, Longitud, Res) :-
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Res),
+    Mayor_aux is Mayor - 1,
+    ordenar_aux(Lista, Mayor_aux, Indice_R, Longitud, Res).
+    
+
+mayor([], 0).
+mayor([L | Lista], L) :-
+    mayor(Lista, M),
+    L > M.
+mayor([L | Lista], M) :-
+    mayor(Lista, M),
+    L =< M.
+
+longitud([], 0).
+longitud([_L | Lista], Res) :-
+    longitud(Lista, R),
+    Res is R + 1.
+
+% me falta considerar el caso en el que el mayor no esté en la lista
+etiquetar_mayor([], _Mayor, Indice, Indice, []).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [Indice | Res]) :-
+    L == Mayor,
+    Index_aux is Indice + 1,
+    etiquetar_mayor(Lista, Mayor, Index_aux, Indice_R, Res).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [100 | Res]) :-
+    L < Mayor,
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Res).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [L | Res]) :-
+    L > Mayor,
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Res).
+
+
 /**
  * Dada una grilla, la resuelve
  * @param PistasFilas Lista con listas de pistas de las filas de la grilla
@@ -7,7 +89,6 @@
  * @param Modo Modo de resolución. Puede ser fila o columna
  * @param Res Grilla resultante luego de resolverla.
 */
-
 resolver([], [], Grilla, _Fila, _Col, _Modo, Grilla).
 resolver([PF | PistasFilas], PistasColumnas, Grilla, Fila, Col, fila, Res) :-
     resolver_fila(PF, Fila, Grilla, R),
