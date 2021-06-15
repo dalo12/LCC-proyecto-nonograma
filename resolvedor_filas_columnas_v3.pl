@@ -15,13 +15,10 @@
  * @param Solucion Nonograma resuelto (en forma de grilla como Grilla)
  */
 resolver_orden(PistasFilas, PistasColumnas, Grilla, Solucion) :-
-    resolver_orden(PistasFilas, PistasColumnas, PistasFilas, PistasColumnas, Grilla, Solucion).
-
-resolver_orden(PistasFilas, PistasColumnas, PistasFilas_long, PistasColumnas_long, Grilla, Solucion) :-
     calcular_prioridad(PistasFilas, PrioridadFilas),
     calcular_prioridad(PistasColumnas, PrioridadColumnas),
-    longitud(PistasFilas_long, LongFilas),
-    longitud(PistasColumnas_long, LongColumnas),
+    longitud(PistasFilas, LongFilas),
+    longitud(PistasColumnas, LongColumnas),
     resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, 0, 0, LongFilas, LongColumnas, fila, Solucion).
 
 %

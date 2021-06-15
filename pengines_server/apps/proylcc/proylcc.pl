@@ -161,26 +161,6 @@ recuperar_elemento(ColN, [_F | Fila], E) :-
 	ColNaux is ColN - 1,
 	recuperar_elemento(ColNaux, Fila, E).
 
-
-/* BACK UP
-put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0, 0):-
-	% NewGrilla es el resultado de reemplazar la fila Row en la posición RowN de Grilla
-	% (RowN-ésima fila de Grilla), por una fila nueva NewRow.
-	
-	replace(Row, RowN, NewRow, Grilla, NewGrilla),
-
-	% NewRow es el resultado de reemplazar la celda Cell en la posición ColN de Row por _,
-	% siempre y cuando Cell coincida con Contenido (Cell se instancia en la llamada al replace/5).
-	% En caso contrario (;)
-	% NewRow es el resultado de reemplazar lo que se que haya (_Cell) en la posición ColN de Row por Conenido.	 
-	
-	(replace(Cell, ColN, _, Row, NewRow),
-	Cell == Contenido 
-		;
-	replace(_Cell, ColN, Contenido, Row, NewRow)).
-*/
-
-
 /*
 * ========================================================================================================
 * PREDICADOS PARA SOLUCIONAR TABLERO
@@ -193,32 +173,242 @@ generarTableroSolucion(PistasFilas, PistasColumnas, Grilla, GrillaSolucion):-
 
 
 obtenerTableroSolucion(PistasFilas, PistasColumnas, Grilla, Resolucion):-
-    resolver(PistasFilas, PistasColumnas, Grilla, 0, 0, fila, Resolucion).
-
+    resolver_orden(PistasFilas, PistasColumnas, Grilla, Resolucion).
+%
+% resolver_orden(+PistasFilas, +PistasColumnas, +Grilla, -Solucion)
+%
 /**
- * Dada una grilla, la resuelve
- * @param PistasFilas Lista con listas de pistas de las filas de la grilla
- * @param PistasColumnas Lista con listas de pistas de las columnas de la grilla
- * @param Fila Número de fila actual que se intenta resolver
- * @param Col Número de columna que se intenta resolver 
- * @param Modo Modo de resolución. Puede ser fila o columna
- * @param Res Grilla resultante luego de resolverla.
-*/
+ * Dada una grilla y sus pistas, resuelve el nonograma de manera eficiente, resolviendo
+ * cada línea acorde a su prioridad definida por su cantidad de restricciones (es decir,
+ * la cantidad de celdas necesarias para satisfacerla) comenzando por la que tiene
+ * mayor cantidad de restricciones y continuando en orden lineal hasta la que tiene
+ * menor cantidad de restricciones
+ * @param PistasFilas Lista de listas de enteros que representan las pistas de las
+ * filas del nonograma
+ * @param PistasColumnas Lista de listas de enteros que representan las pistas de
+ * las columnas del nonograma
+ * @param Grilla Grilla que representa el nonograma
+ * @param Solucion Nonograma resuelto (en forma de grilla como Grilla)
+ */
+resolver_orden(PistasFilas, PistasColumnas, Grilla, Solucion) :-
+    calcular_prioridad(PistasFilas, PrioridadFilas),
+    calcular_prioridad(PistasColumnas, PrioridadColumnas),
+    longitud(PistasFilas, LongFilas),
+    longitud(PistasColumnas, LongColumnas),
+    resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, 0, 0, LongFilas, LongColumnas, fila, Solucion).
 
-resolver([], [], Grilla, _Fila, _Col, _Modo, Grilla).
-resolver([PF | PistasFilas], PistasColumnas, Grilla, Fila, Col, fila, Res) :-
-    resolver_fila(PF, Fila, Grilla, R),
-    Fila_aux is Fila + 1,
-    resolver(PistasFilas, PistasColumnas, R, Fila_aux, Col, columna, Res).
-resolver(PistasFilas, [PC | PistasColumnas], Grilla, Fila, Col, columna, Res) :-
-    resolver_columna(PC, Col, Grilla, R),
-    Col_aux is Col + 1,
-    resolver(PistasFilas, PistasColumnas, R, Fila, Col_aux, fila, Res).
-resolver(PistasFilas, [], Grilla, Fila, Col, columna, Res) :-
-    resolver(PistasFilas, [], Grilla, Fila, Col, fila, Res).
-resolver([], PistasColumnas, Grilla, Fila, Col, fila, Res) :- 
-    resolver([], PistasColumnas, Grilla, Fila, Col, columna, Res).
+%
+% resolver_orden_aux(+PistasFilas, +PistasColumnas, +PrioridadFilas, +PrioridadColumnas, +Grilla, +Indice_Fila, +Indice_Columna, +Maxima_Fila, +Maxima_Columna +Modo, -Solucion)
+% Modo puede ser 'fila' o 'columna'
+%
+% Debe ser invocado de la siguiente manera
+% resolver_orden_aux([lista de listas de enteros], [lista de listas de enteros], [lista de enteros], [lista de enteros], [[grilla]], 0, 0, fila, R)
+%
+/**
+ * Resuelve un nonograma de acuerdo a sus pistas en orden de mayor restricciones a menor restricciones
+ * @param PistasFilas Pistas de las filas del nonograma
+ * @param PistasColumnas Pistas de las columnas del nonograma
+ * @param PrioridadFilas Lista con enteros que representan el orden en el que deben ser resueltas
+ * las filas
+ * @param PrioridadColumnas Lista con enteros que representan el orden en el que deben ser resueltas
+ * las columnas
+ * @param Grilla Grilla que representa al nonograma que debe ser resuelto
+ * @param Index_F Número de la fila que debe ser resuelta (corresponde a su prioridad, no su índice real)
+ * @param Index_C Número de la columna que debe ser resuelta (corresponde a su prioridad, no su índice real)
+ * @param Max_F Número de filas a resolver (0..length(grilla])-1)
+ * @param Max_C Número de columnas a resolver (0..length(grilla[0])-1)
+ * @param Modo Modo de resolución. Puede ser 'fila' o 'columna'
+ * @param Solucion Grilla que corresponde al nonograma resuelto
+ */
+resolver_orden_aux(_PistasFilas, _PistasColumnas, _PrioridadFilas, _PrioridadColumnas, Grilla, Max_F, Max_C, Max_F, Max_C, _Modo, Grilla) :-
+    !.
+resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Index_C, Max_F, Max_C, fila, Solucion) :-
+    recuperar_indice(PrioridadFilas, Index_F, N_Pista),
+    recuperar_elemento(N_Pista, PistasFilas, PF),
+    resolver_fila(PF, N_Pista, Grilla, Grilla_Parcial),
+    Index_F_Aux is Index_F + 1,
+    resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla_Parcial, Index_F_Aux, Index_C, Max_F, Max_C, columna, Solucion).
+resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Index_C, Max_F, Max_C, columna, Solucion) :-
+    recuperar_indice(PrioridadColumnas, Index_C, N_Pista),
+    recuperar_elemento(N_Pista, PistasColumnas, PC),
+    resolver_columna(PC, N_Pista, Grilla, Grilla_Parcial),
+    Index_C_Aux is Index_C + 1,
+    resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla_Parcial, Index_F, Index_C_Aux, Max_F, Max_C, fila, Solucion).
+resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Max_F, Index_C, Max_F, Max_C, fila, Solucion) :-
+    resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Max_F, Index_C, Max_F, Max_C, columna, Solucion).
+resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Max_C, Max_F, Max_C, columna, Solucion) :-
+    resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Max_C, Max_F, Max_C, fila, Solucion).
 
+%
+% recuperar_indice(+Lista, +E, -Index)
+%
+/**
+ * Dado un elemento y una lista, devuelve la posición (índice) que ocupa ese elemento en la lista
+ * @param Lista Lista a recorrer
+ * @param E Elemento a buscar
+ * @param Index Índice correspondiente a la posición que ocupa el elemento E en la lista Lista
+ */
+recuperar_indice([L | _Lista], L, 0).
+recuperar_indice([_L | Lista], E, Index) :-
+    recuperar_indice(Lista, E, Index_aux),
+    Index is Index_aux + 1.
+%
+% calcular_prioridad(+Lista, -Res)
+%
+/**
+ * Dada una lista de pistas, calcula en qué orden deben ser resueltas si se resuelve
+ * en orden de prioridad desde las pistas con mayor cantidad de restricciones hasta
+ * las pistas con menor cantidad de restricciones (es decir, que necesitan menor
+ * cantidad de celdas para ser satisfechas)
+ * @param Lista Lista de pistas (lista de listas de enteros)
+ * @param Res Lista que indica el orden en el que se deben resolver las pistas
+ */
+calcular_prioridad(Lista, Res) :-
+    calcular_restricciones(Lista, Restricciones),
+    ordenar(Restricciones, Res).
+%
+% calcular_restricciones/2
+% calcular_restricciones(+Pistas, -Suma)
+%
+% Debe ser invocado de la siguiente manera:
+% calcular_restricciones([[lista de naturales], ...], R)
+%
+/**
+ * Dada una lista de pistas, calcula la cantidad mínima de celdas que ocuparía la 
+ * solución de cada una
+ * @param Pistas Lista de listas de naturales que representan las pistas de las celdas
+ * @param Suma Suma resultante que indica la cantidad mínima de celdas que ocuparía la
+ * solución de las pistas
+ */ 
+calcular_restricciones([], []).
+calcular_restricciones([P | Pistas], [Suma | Res]) :-
+    sumar_pistas(P, Suma),
+    calcular_restricciones(Pistas, Res).
+
+%
+% sumar_pistas/2
+% sumar_pistas(+Pistas, -Suma)
+%
+% Debe ser invocado de la siguiente manera:
+% sumar_pistas([lista de naturales], R)
+%
+/**
+ * Dada una pista, retorna la cantidad mínima de celdas que ocuparía su solución
+ * @param Pistas Lista de naturales que representa las pistas
+ * @param Suma Suma resultante que indica la cantidad mínima de celdas que ocuparía
+ * la solución de las pistas
+ */ 
+sumar_pistas([], 0).
+sumar_pistas([P | Pistas], Suma) :-
+    Pistas \== [],
+    sumar_pistas(Pistas, Suma_aux),
+    Suma is Suma_aux + P + 1, % sumo 1 por cada espacio vacío
+    !. % para que no me genere más respuestas de las necesarias.
+       % por ej. para [1,1] me retornaba 3 y luego 2. Con este cut evito eso
+sumar_pistas([P | Pistas], Suma) :-
+    sumar_pistas(Pistas, Suma_aux),
+    Suma is Suma_aux + P.
+
+%
+% ordenar(+Lista, -R)
+%
+% Ejemplo
+% ?- ordenar([1,2,3], R).
+% R = [2,1,0].
+%
+/**
+ * Dada una lista, devuelve el orden en el que debe ser recorrida de mayor a menor
+ * @param Lista Lista a examinar
+ * @param R Lista que contiene el orden en el que debe ser recorrida la lista Lista
+ * recorriéndola de mayor a menor
+ */
+ordenar(Lista, R) :-
+    mayor(Lista, M),
+    longitud(Lista, Long),
+    ordenar_aux(Lista, M, 0, Long, Lista, R).
+
+%
+% ordenar_aux(+Lista1, +Mayor, +Indice, +Longitud, +Lista2, -Res)
+% Lista2 debe ser de la misma longitud que Lista1. En general, Lista1 = Lista2
+%
+% Debe ser invocada de la siguiente manera:
+% ordenar_aux([lista de enteros], n_entero, 0, m_entero, [lista de enteros], R).
+%
+/**
+ * Dada una lista, devuelve el orden en el que debe ser recorrida con respecto a Mayor
+ * @param Lista Lista a examinar
+ * @param Mayor Número mayor de la lista
+ * @param Indice Próximo índice a agregar en la lista Orden
+ * @param Longitud Longitud de la lista Lista
+ * @param Orden Lista que indica el orden en el que debe ser recorrida la lista
+ * Lista hasta una iteración anterior
+ * @param Res Lista resultante que indica en qué orden debe ser recorrida la lista
+ * acorde al número Mayor actual
+ */
+ordenar_aux(_Lista, _Mayor, Indice, Indice, Orden, Orden) :-
+    !. % sino genera el mismo resultado infinitamente
+ordenar_aux(Lista, Mayor, Indice, Longitud, Orden, Res) :-
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Orden, R),
+    Mayor_aux is Mayor - 1,
+    ordenar_aux(Lista, Mayor_aux, Indice_R, Longitud, R, Res).
+
+%
+% etiquetar_mayor(+Lista, +Mayor, +Indice, -Indice_R, +Orden, -Res)
+%
+/**
+ * Dada una lista de enteros y el número mayor de entre la lista de enteros,
+ * etiqueta en qué posiciones de la lista aparece ese número. Las posiciones
+ * ocupadas por un número menor a mayor, las etiqueta con 100. Las posiciones
+ * ocupadas por un número mayor a mayor, las deja con su etiqueta actual.
+ * @param Lista Lista de enteros a examinar
+ * @param Mayor Número mayor de la lista Lista
+ * @param Indice Índice con el que etiquetar a la posición
+ * @return Indice_R Último índice ocupado incrementado en 1
+ * @param Orden Lista de etiquetas que indican el orden de los elementos hasta
+ * el momento de la llamada a la función actual
+ * @return Res Lista resultante etiquetando las posiciones en la que aparece el
+ * entero Mayor
+ */
+etiquetar_mayor([], _Mayor, Indice, Indice, [], []).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [_O | Orden], [Indice | Res]) :-
+    L == Mayor,
+    Index_aux is Indice + 1,
+    etiquetar_mayor(Lista, Mayor, Index_aux, Indice_R, Orden, Res).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [_O | Orden], [100 | Res]) :-
+    L < Mayor,
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Orden, Res).
+etiquetar_mayor([L | Lista], Mayor, Indice, Indice_R, [O | Orden], [O | Res]) :-
+    L > Mayor,
+    etiquetar_mayor(Lista, Mayor, Indice, Indice_R, Orden, Res).
+
+%
+% mayor(+Lista, -M)
+%
+/**
+ * Dada una lista de enteros, retorna cuál es su mayor
+ * @param Lista Lista de enteros
+ * @param M Mayor de entre la lista dada
+ */
+mayor([L], L).
+mayor([L | Lista], L) :-
+    mayor(Lista, M),
+    L > M.
+mayor([L | Lista], M) :-
+    mayor(Lista, M),
+    L =< M.
+
+%
+% longitud(+Lista, -Res)
+%
+/**
+ * Dada una lista, devuelve su longitud
+ * @param Lista Lista a la que calcularle su longitud
+ * @param Res Longitud de la lista
+ */
+longitud([], 0).
+longitud([_L | Lista], Res) :-
+    longitud(Lista, R),
+    Res is R + 1.
 % 
 % resolver_fila/4
 % resolver_fila(+PistasFila, +N_Fila, +Grilla, -Res)
