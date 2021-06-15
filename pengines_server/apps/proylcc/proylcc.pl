@@ -192,17 +192,6 @@ generarTableroSolucion(PistasFilas, PistasColumnas, Grilla, GrillaSolucion):-
     assert(grillaSolucion(GrillaSolucion)). %almacena en el programa la grilla solucion
 
 
-/*
-obtenerTableroSolucion(_PistasFilas, _PistasColumnas, _Grilla, Resolucion) :- 
-    Resolucion = [
-        ["X","X","#","X","X"], 		
-        ["X","#","#","#","X"],
-        ["X","#","X","#","X"],		% Grilla
-        ["X","#","#","#","X"],
-        ["#","#","#","#","#"]
-    ]
-.  
-*/
 obtenerTableroSolucion(PistasFilas, PistasColumnas, Grilla, Resolucion):-
     resolver(PistasFilas, PistasColumnas, Grilla, 0, 0, fila, Resolucion).
 
@@ -271,7 +260,6 @@ resolver_fila(PistasFila, 0, [G | Grilla], [Res | Grilla]) :-
 resolver_fila_aux([0], [], rafaga, []).
 resolver_fila_aux([], [], no_rafaga, []).
 resolver_fila_aux(Pistas, [F | Fila], no_rafaga, ["X" | Res]) :-
-    % F \== [], % verificar si el código sigue andando sin esta línea. De ser así, borrarla
     F \== "#",
     resolver_fila_aux(Pistas, Fila, no_rafaga, Res).
 resolver_fila_aux([P | Pistas], [F | Fila], no_rafaga, ["#" | Res]) :-
