@@ -145,21 +145,8 @@ verificar_pistas_columnas(PistasColumnas, ColN, Grilla, ColSat) :-
 % recuperar_columna(+ColN, +Grilla, -Columna).
 recuperar_columna(_ColN, [], []).
 recuperar_columna(ColN, [G | Grilla], [E | Columna]) :-
-	recuperar_elemento(ColN, G, E),
+	recuperar_elemento(G, ColN, E),
 	recuperar_columna(ColN, Grilla, Columna).
-
-/**
- * Método auxiliar recuperar_elemento
- * Devuelve un elemento en un índice dado de una lista
- * @param {ColN} Índice donde se encuentra el elemento (0..length(Fila))
- * @param {Fila} Lista donde buscar el elemento
- * @param {E} Devuelve el elemento buscado
- */
-% recuperar_elemento(+ColN, +Fila, -E).
-recuperar_elemento(0, [F | _Fila], F).
-recuperar_elemento(ColN, [_F | Fila], E) :-
-	ColNaux is ColN - 1,
-	recuperar_elemento(ColNaux, Fila, E).
 
 /*
 * ========================================================================================================
@@ -224,13 +211,13 @@ resolver_orden_aux(_PistasFilas, _PistasColumnas, _PrioridadFilas, _PrioridadCol
     !.
 resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Index_C, Max_F, Max_C, fila, Solucion) :-
     recuperar_indice(PrioridadFilas, Index_F, N_Pista),
-    recuperar_elemento(N_Pista, PistasFilas, PF),
+    recuperar_elemento(PistasFilas, N_Pista, PF),
     resolver_fila(PF, N_Pista, Grilla, Grilla_Parcial),
     Index_F_Aux is Index_F + 1,
     resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla_Parcial, Index_F_Aux, Index_C, Max_F, Max_C, columna, Solucion).
 resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Index_C, Max_F, Max_C, columna, Solucion) :-
     recuperar_indice(PrioridadColumnas, Index_C, N_Pista),
-    recuperar_elemento(N_Pista, PistasColumnas, PC),
+    recuperar_elemento(PistasColumnas, N_Pista, PC),
     resolver_columna(PC, N_Pista, Grilla, Grilla_Parcial),
     Index_C_Aux is Index_C + 1,
     resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla_Parcial, Index_F, Index_C_Aux, Max_F, Max_C, fila, Solucion).
@@ -238,6 +225,21 @@ resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumna
     resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Max_F, Index_C, Max_F, Max_C, columna, Solucion).
 resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Max_C, Max_F, Max_C, columna, Solucion) :-
     resolver_orden_aux(PistasFilas, PistasColumnas, PrioridadFilas, PrioridadColumnas, Grilla, Index_F, Max_C, Max_F, Max_C, fila, Solucion).
+
+
+%
+% recuperar_elemento(+Lista, +Indice, -Elemento)
+%
+/**
+ * Dado un índice, devuelve el elemento que ocupa esa posición en la lista dada
+ * @param Lista Lista a recorrer
+ * @param Index Índice donde se encuentra el elemento
+ * @param Res Elemento que ocupa la posición Index en la lista Lista
+ */
+recuperar_elemento([L | _Lista], 0, L).
+recuperar_elemento([_L | Lista], Index, Res) :-
+    Index_aux is Index - 1,
+    recuperar_elemento(Lista, Index_aux, Res).
 
 %
 % recuperar_indice(+Lista, +E, -Index)
@@ -409,6 +411,30 @@ longitud([], 0).
 longitud([_L | Lista], Res) :-
     longitud(Lista, R),
     Res is R + 1.
+
+/**
+ * Dada una grilla, la resuelve
+ * @param PistasFilas Lista con listas de pistas de las filas de la grilla
+ * @param PistasColumnas Lista con listas de pistas de las columnas de la grilla
+ * @param Fila Número de fila actual que se intenta resolver
+ * @param Col Número de columna que se intenta resolver 
+ * @param Modo Modo de resolución. Puede ser fila o columna
+ * @param Res Grilla resultante luego de resolverla.
+*/
+resolver([], [], Grilla, _Fila, _Col, _Modo, Grilla).
+resolver([PF | PistasFilas], PistasColumnas, Grilla, Fila, Col, fila, Res) :-
+    resolver_fila(PF, Fila, Grilla, R),
+    Fila_aux is Fila + 1,
+    resolver(PistasFilas, PistasColumnas, R, Fila_aux, Col, columna, Res).
+resolver(PistasFilas, [PC | PistasColumnas], Grilla, Fila, Col, columna, Res) :-
+    resolver_columna(PC, Col, Grilla, R),
+    Col_aux is Col + 1,
+    resolver(PistasFilas, PistasColumnas, R, Fila, Col_aux, fila, Res).
+resolver(PistasFilas, [], Grilla, Fila, Col, columna, Res) :-
+    resolver(PistasFilas, [], Grilla, Fila, Col, fila, Res).
+resolver([], PistasColumnas, Grilla, Fila, Col, fila, Res) :- 
+    resolver([], PistasColumnas, Grilla, Fila, Col, columna, Res).
+
 % 
 % resolver_fila/4
 % resolver_fila(+PistasFila, +N_Fila, +Grilla, -Res)
@@ -450,6 +476,7 @@ resolver_fila(PistasFila, 0, [G | Grilla], [Res | Grilla]) :-
 resolver_fila_aux([0], [], rafaga, []).
 resolver_fila_aux([], [], no_rafaga, []).
 resolver_fila_aux(Pistas, [F | Fila], no_rafaga, ["X" | Res]) :-
+    % F \== [], % verificar si el código sigue andando sin esta línea. De ser así, borrarla
     F \== "#",
     resolver_fila_aux(Pistas, Fila, no_rafaga, Res).
 resolver_fila_aux([P | Pistas], [F | Fila], no_rafaga, ["#" | Res]) :-
@@ -535,7 +562,7 @@ resolver_columna([0 | Pistas], N_Col, N_Col, [[F | Fila] | Grilla], Cabeza, rafa
     F \== "#",
     resolver_columna(Pistas, N_Col, 0, Grilla, [], no_rafaga, Res),
     append(Cabeza, ["X" | Fila], R).
-
+    
 /*
 * ========================================================================================================
 * PREDICADO PARA REVELAR EL VALOR DE LA CELDA

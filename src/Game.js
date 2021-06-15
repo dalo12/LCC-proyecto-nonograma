@@ -106,8 +106,16 @@ class Game extends React.Component {
         let satisfaccion_filas_aux = this.state.satisfaccion_filas;
         let satisfaccion_cols_aux = this.state.satisfaccion_cols;
 
-        satisfaccion_filas_aux[i] = response['FilaSat'];
-        satisfaccion_cols_aux[j] = response['ColSat'];
+        if (this.state.resolver_celda_on){
+          if (cambio_realizado){
+            satisfaccion_filas_aux[i] = response['FilaSat'];
+            satisfaccion_cols_aux[j] = response['ColSat'];
+          }
+        }
+        else{
+          satisfaccion_filas_aux[i] = response['FilaSat'];
+          satisfaccion_cols_aux[j] = response['ColSat'];
+        }
         
         this.setState({
           satisfaccion_filas: satisfaccion_filas_aux,
