@@ -215,37 +215,47 @@ ganado(satisfaccion_filas, satisfaccion_cols){
 }
 
 mostrarSolucion(){
-    this.setState({
-        tablero_solucion_off: !this.state.tablero_solucion_off
-      }
-    )
-    //Si se debe mostrar el tablero solucion, entonces reemplazar grilla por su solucion
-    if (this.state.tablero_solucion_off){
-      const queryS = 'grillaSolucion(GrillaSolucion)';      
-      this.pengine.query(queryS, (success, response) => {
-        if (success) {
-          this.setState({
-            grid_aux: this.state.grid,
-            grid: response['GrillaSolucion'],
-            waiting: true //Desabilita el clickeado de los cuadrados
-          });
-        }
-      });
+    if (this.state.resolver_celda_on){
+        alert("No se puede mostrar el tablero solución estando activada la función reveldar boton");
     }
     else{
       this.setState({
-        grid: this.state.grid_aux,
-        grid_aux: null,
-        waiting: false //Habilita el clickeado de los cuadrados
-      })
+        tablero_solucion_off: !this.state.tablero_solucion_off
+        }
+      )
+      //Si se debe mostrar el tablero solucion, entonces reemplazar grilla por su solucion
+      if (this.state.tablero_solucion_off){
+        const queryS = 'grillaSolucion(GrillaSolucion)';      
+        this.pengine.query(queryS, (success, response) => {
+          if (success) {
+            this.setState({
+              grid_aux: this.state.grid,
+              grid: response['GrillaSolucion'],
+              waiting: true //Desabilita el clickeado de los cuadrados
+            });
+          }
+        });
+      }
+      else{
+        this.setState({
+          grid: this.state.grid_aux,
+          grid_aux: null,
+          waiting: false //Habilita el clickeado de los cuadrados
+        })
+      }
     }
 }
 
 descubrirCelda(){
-  alert("Seleccione una casilla vacía para revelar su valor")
-  this.setState({
-    resolver_celda_on: true
-  });
+  let texto = (this.state.tablero_solucion_off) ? "Seleccione una casilla vacía para revelar su valor" : "Para revelar una celda, primero debe ocultar el tablero solución";
+  alert(texto);
+  if (this.state.tablero_solucion_off){
+    this.setState({
+      resolver_celda_on: true
+    });
+  }
+
+  
 }
 
   render() {
