@@ -96,8 +96,7 @@ class Game extends React.Component {
       if (success) {
         this.setState({
           grid: response['GrillaRes'],
-          waiting: false,
-          resolver_celda_on: true
+          waiting: false
         });
 
         if (this.state.resolver_celda_on){
