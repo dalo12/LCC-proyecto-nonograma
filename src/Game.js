@@ -32,13 +32,14 @@ class Game extends React.Component {
   }
 
   handlePengineCreate() {
-    const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
+    let queryS = 'init(PistasFilas, PistasColumns, Grilla), generarTableroSolucion(PistasFilas, PistasColumns, Grilla, GrillaSolucion)';
     this.pengine.query(queryS, (success, response) => {
       if (success) {
         this.setState({
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
-          colClues: response['PistasColumns']
+          colClues: response['PistasColumns'],
+          grid_aux: response['GrillaSolucion']
         });
 
         let satisfaccion_filas_aux = [];
@@ -70,6 +71,7 @@ class Game extends React.Component {
     
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', '_')
 
+    let cambio_realizado = false;
     let pistas_filas = this.formatear_pista(this.state.rowClues);
     let pistas_columnas = this.formatear_pista(this.state.colClues);
 
@@ -82,7 +84,7 @@ class Game extends React.Component {
     else{
       //revelarCelda(Grilla, [RowN, ColN], PistasFilas, PistasColumnas, NewGrilla, FilaSat, ColSat)
         queryS = 'revelarCelda(' + squaresS + ', [' + i + ',' + j + ']' 
-          + ', ' + pistas_filas + ', ' + pistas_columnas + ', GrillaRes, FilaSat, ColSat)';
+          + ', ' + pistas_filas + ', ' + pistas_columnas + ', GrillaRes, FilaSat, ColSat, ResultadoOp)';
     }
 
     console.log(queryS);
@@ -94,8 +96,13 @@ class Game extends React.Component {
       if (success) {
         this.setState({
           grid: response['GrillaRes'],
-          waiting: false
+          waiting: false,
+          resolver_celda_on: true
         });
+
+        if (this.state.resolver_celda_on){
+          cambio_realizado = (response['ResultadoOp']===1) ? true : false;
+        }
 
         let satisfaccion_filas_aux = this.state.satisfaccion_filas;
         let satisfaccion_cols_aux = this.state.satisfaccion_cols;
@@ -108,6 +115,14 @@ class Game extends React.Component {
           satisfaccion_cols: satisfaccion_cols_aux,
           victoria: this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)
         });
+        
+        if (this.state.resolver_celda_on){
+          this.setState({
+            resolver_celda_on: false
+          });
+          let texto = (cambio_realizado) ? "Valor revelado en la celda ("+ i + ", " + j + ")" : "No se puede revelar el valor de una celda no vacía.";
+          alert(texto);
+        }
 
       } else {
         this.setState({
@@ -115,13 +130,6 @@ class Game extends React.Component {
         });
       }
     });
-
-    if (this.state.resolver_celda_on){
-      this.setState({
-        resolver_celda_on: false
-      });
-      alert("Valor revelado en la celda ("+ i + ", " + j + ")");
-    }
   }
 
   /**
