@@ -11,6 +11,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      grid_solucion: null,
       grid_aux: null,
       grid: null,
       rowClues: null,
@@ -38,7 +39,8 @@ class Game extends React.Component {
         this.setState({
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
-          colClues: response['PistasColumns']
+          colClues: response['PistasColumns'],
+          grid_solucion: response['GrillaSolucion']
         });
 
         let satisfaccion_filas_aux = [];
@@ -219,20 +221,15 @@ mostrarSolucion(){
     }
     else{
       this.setState({
-        tablero_solucion_off: !this.state.tablero_solucion_off
-        }
-      )
+          tablero_solucion_off: !this.state.tablero_solucion_off
+        });
+      
       //Si se debe mostrar el tablero solucion, entonces reemplazar grilla por su solucion
       if (this.state.tablero_solucion_off){
-        const queryS = 'grillaSolucion(GrillaSolucion)';      
-        this.pengine.query(queryS, (success, response) => {
-          if (success) {
-            this.setState({
-              grid_aux: this.state.grid,
-              grid: response['GrillaSolucion'],
-              waiting: true //Desabilita el clickeado de los cuadrados
-            });
-          }
+        this.setState({
+          grid_aux: this.state.grid,
+          grid: this.state.grid_solucion,
+          waiting: true //Desabilita el clickeado de los cuadrados
         });
       }
       else{
