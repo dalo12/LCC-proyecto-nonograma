@@ -21,7 +21,7 @@ class Game extends React.Component {
       satisfaccion_cols: [],
       victoria: false,
       tablero_solucion_off: true,
-      resolver_celda_on: false
+      revelar_celda_on: false
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -38,8 +38,7 @@ class Game extends React.Component {
         this.setState({
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
-          colClues: response['PistasColumns'],
-          grid_aux: response['GrillaSolucion']
+          colClues: response['PistasColumns']
         });
 
         let satisfaccion_filas_aux = [];
@@ -77,12 +76,12 @@ class Game extends React.Component {
 
     let queryS = null;
     
-    if (!this.state.resolver_celda_on){
+    if (!this.state.revelar_celda_on){
         queryS = 'put("' + this.state.opcion + '", [' + i + ',' + j + ']' 
            + ', ' + pistas_filas + ', ' + pistas_columnas + ',' + squaresS + ', GrillaRes, FilaSat, ColSat)';
     }
     else{
-      //revelarCelda(Grilla, [RowN, ColN], PistasFilas, PistasColumnas, NewGrilla, FilaSat, ColSat)
+      //revelarCelda(Grilla, [RowN, ColN], PistasFilas, PistasColumnas, NewGrilla, FilaSat, ColSat, ResultadoOp)
         queryS = 'revelarCelda(' + squaresS + ', [' + i + ',' + j + ']' 
           + ', ' + pistas_filas + ', ' + pistas_columnas + ', GrillaRes, FilaSat, ColSat, ResultadoOp)';
     }
@@ -99,14 +98,14 @@ class Game extends React.Component {
           waiting: false
         });
 
-        if (this.state.resolver_celda_on){
+        if (this.state.revelar_celda_on){
           cambio_realizado = (response['ResultadoOp']===1) ? true : false;
         }
 
         let satisfaccion_filas_aux = this.state.satisfaccion_filas;
         let satisfaccion_cols_aux = this.state.satisfaccion_cols;
 
-        if (this.state.resolver_celda_on){
+        if (this.state.revelar_celda_on){
           if (cambio_realizado){
             satisfaccion_filas_aux[i] = response['FilaSat'];
             satisfaccion_cols_aux[j] = response['ColSat'];
@@ -123,9 +122,9 @@ class Game extends React.Component {
           victoria: this.ganado(this.state.satisfaccion_filas, this.state.satisfaccion_cols)
         });
         
-        if (this.state.resolver_celda_on){
+        if (this.state.revelar_celda_on){
           this.setState({
-            resolver_celda_on: false
+            revelar_celda_on: false
           });
           let texto = (cambio_realizado) ? "Valor revelado en la celda ("+ i + ", " + j + ")" : "No se puede revelar el valor de una celda no vacía.";
           alert(texto);
@@ -215,7 +214,7 @@ ganado(satisfaccion_filas, satisfaccion_cols){
 }
 
 mostrarSolucion(){
-    if (this.state.resolver_celda_on){
+    if (this.state.revelar_celda_on){
         alert("No se puede mostrar el tablero solución estando activada la función reveldar boton");
     }
     else{
@@ -251,7 +250,7 @@ descubrirCelda(){
   alert(texto);
   if (this.state.tablero_solucion_off){
     this.setState({
-      resolver_celda_on: true
+      revelar_celda_on: true
     });
   }
 
@@ -269,7 +268,7 @@ descubrirCelda(){
     }
 
     let textoBotonSolucion = (this.state.tablero_solucion_off) ? "Mostrar solución" : "Ocultar solución";
-    let textoBotonCelda = (this.state.resolver_celda_on) ? "Resolviendo celda" : "Resolver celda";
+    let textoBotonCelda = (this.state.revelar_celda_on) ? "Revelando celda" : "Revelar celda";
 
     return (
       <div className="global">
