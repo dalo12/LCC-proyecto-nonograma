@@ -1,4 +1,4 @@
-:- module(proylcc, [put/8, revelarCelda/8, grillaSolucion/1, generarTableroSolucion/4]).
+:- module(proylcc, [put/8, revelarCelda/8, generarTableroSolucion/4]).
 :- use_module(library(lists)).
 
 :-dynamic grillaSolucion/1.
