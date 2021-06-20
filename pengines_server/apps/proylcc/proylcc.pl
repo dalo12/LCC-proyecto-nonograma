@@ -409,29 +409,6 @@ longitud([_L | Lista], Res) :-
     longitud(Lista, R),
     Res is R + 1.
 
-/**
- * Dada una grilla, la resuelve
- * @param PistasFilas Lista con listas de pistas de las filas de la grilla
- * @param PistasColumnas Lista con listas de pistas de las columnas de la grilla
- * @param Fila Número de fila actual que se intenta resolver
- * @param Col Número de columna que se intenta resolver 
- * @param Modo Modo de resolución. Puede ser fila o columna
- * @param Res Grilla resultante luego de resolverla.
-*/
-resolver([], [], Grilla, _Fila, _Col, _Modo, Grilla).
-resolver([PF | PistasFilas], PistasColumnas, Grilla, Fila, Col, fila, Res) :-
-    resolver_fila(PF, Fila, Grilla, R),
-    Fila_aux is Fila + 1,
-    resolver(PistasFilas, PistasColumnas, R, Fila_aux, Col, columna, Res).
-resolver(PistasFilas, [PC | PistasColumnas], Grilla, Fila, Col, columna, Res) :-
-    resolver_columna(PC, Col, Grilla, R),
-    Col_aux is Col + 1,
-    resolver(PistasFilas, PistasColumnas, R, Fila, Col_aux, fila, Res).
-resolver(PistasFilas, [], Grilla, Fila, Col, columna, Res) :-
-    resolver(PistasFilas, [], Grilla, Fila, Col, fila, Res).
-resolver([], PistasColumnas, Grilla, Fila, Col, fila, Res) :- 
-    resolver([], PistasColumnas, Grilla, Fila, Col, columna, Res).
-
 % 
 % resolver_fila/4
 % resolver_fila(+PistasFila, +N_Fila, +Grilla, -Res)
