@@ -155,12 +155,9 @@ recuperar_columna(ColN, [G | Grilla], [E | Columna]) :-
 */
 
 generarTableroSolucion(PistasFilas, PistasColumnas, Grilla, GrillaSolucion):-
-	obtenerTableroSolucion(PistasFilas, PistasColumnas, Grilla, GrillaSolucion),
+	resolver_orden(PistasFilas, PistasColumnas, Grilla, GrillaSolucion),
     assert(grillaSolucion(GrillaSolucion)). %almacena en el programa la grilla solucion
 
-
-obtenerTableroSolucion(PistasFilas, PistasColumnas, Grilla, Resolucion):-
-    resolver_orden(PistasFilas, PistasColumnas, Grilla, Resolucion).
 %
 % resolver_orden(+PistasFilas, +PistasColumnas, +Grilla, -Solucion)
 %
